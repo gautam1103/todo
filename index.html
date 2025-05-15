@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ToDo List App</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            /* Gradient background */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #00c6ff;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0072ff;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #ff3b3b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>💡Kya Soch Rahe Ho🤔</h1>
+        <form id="todo-form">
+            <input type="text" id="todo-input" placeholder="Enter a new task..." required />
+            <button type="submit">Add</button>
+        </form>
+        <ul id="todo-list"></ul>
+    </div>
+
+    <script>
+        // const API_URL = "http://localhost:5000/todos";
+        const API_URL = window.location.hostname === "localhost" ? "http://localhost:5000/todos" : "https://your-live-api-url.up.railway.app/todos";
+
+        const form = document.getElementById("todo-form");
+        const input = document.getElementById("todo-input");
+        const list = document.getElementById("todo-list");
+
+        async function fetchTodos() {
+            const res = await fetch(API_URL);
+            const todos = await res.json();
+            list.innerHTML = "";
+            todos.forEach(todo => {
+                const li = document.createElement("li");
+                li.textContent = todo.text;
+                const del = document.createElement("button");
+                del.textContent = "Delete";
+                del.className = "delete-btn";
+                del.onclick = async () => {
+                    await fetch(`${API_URL}/${todo.id}`, { method: "DELETE" });
+                    fetchTodos();
+                };
+                li.appendChild(del);
+                list.appendChild(li);
+            });
+        }
+
+        form.addEventListener("submit", async e => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text })
+            });
+            input.value = "";
+            fetchTodos();
+        });
+
+        fetchTodos();
+    </script>
+</body>
+
+</html>
