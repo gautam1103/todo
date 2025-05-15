@@ -6,10 +6,11 @@ require('dotenv').config();
 const Todo = require('./models/Todo');
 
 const app = express();
+app.use(cors());
 
-app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://kya-chll-rha-hai-dimag-mein.onrender.com']
-}));
+// app.use(cors({
+//   origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://kya-chll-rha-hai-dimag-mein.onrender.com']
+// }));
 
 app.use(express.json());
 
