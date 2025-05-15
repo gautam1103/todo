@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ToDo List App</title>
+    <title>Kya Soch Rahe Ho</title>
     <style>
         body {
             margin: 0;
@@ -102,7 +102,7 @@
 
     <script>
         // const API_URL = "http://localhost:5000/todos";
-        const API_URL = window.location.hostname === "localhost" ? "http://localhost:5000/todos" : "https://your-live-api-url.up.railway.app/todos";
+        const API_URL = window.location.hostname === "localhost" ? "http://localhost:5000/todos" : "https://kya-chll-rha-hai-dimag-mein.onrender.com/todos";
 
         const form = document.getElementById("todo-form");
         const input = document.getElementById("todo-input");
@@ -119,7 +119,7 @@
                 del.textContent = "Delete";
                 del.className = "delete-btn";
                 del.onclick = async () => {
-                    await fetch(`${API_URL}/${todo.id}`, { method: "DELETE" });
+                    await fetch(`${API_URL}/${todo._id}`, { method: "DELETE" });
                     fetchTodos();
                 };
                 li.appendChild(del);

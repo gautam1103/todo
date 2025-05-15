@@ -1,8 +1,18 @@
 const mongoose = require('mongoose');
 
-const TaskSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  completed: { type: Boolean, default: false }
+const todoSchema = new mongoose.Schema({
+  text: String,
 });
 
-module.exports = mongoose.model('Task', TaskSchema);
+const Todo = mongoose.model('Todo', todoSchema);
+
+app.get('/todos', async (req, res) => {
+  const todos = await Todo.find();
+  res.json(todos);
+});
+
+app.post('/todos', async (req, res) => {
+  const newTodo = new Todo({ text: req.body.text });
+  await newTodo.save();
+  res.status(201).json(newTodo);
+});

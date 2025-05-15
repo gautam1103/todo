@@ -1,44 +1,64 @@
+const express = require('express');
+const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const express = require('express');
-const cors = require('cors');
-const app = express(); // ✅ First initialize app
+const Todo = require('./models/Todo');
 
-// Middleware
-app.use(express.json());
+const app = express();
+
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500']
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://kya-chll-rha-hai-dimag-mein.onrender.com']
 }));
 
-// MongoDB Connection
+app.use(express.json());
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
-  .catch((err) => {
-    console.log(err);
-    process.exit(1); // Stop app if DB fails
-  });
+    .catch((err) => console.error('MongoDB connection error:', err));
+  
+// app.get('/testdb', async (req, res) => {
+//   try {
+//     const todos = await Todo.find();
+//     console.log("TestDB Todos:", todos);
+//     res.json(todos);
+//   } catch (err) {
+//     res.status(500).json({ error: 'Test DB failed' });
+//   }
+// });
 
-// Routes
-let todos = [];
 
-app.get('/todos', (req, res) => {
-  res.json(todos);
+// GET /todos - fetch all todos from DB
+app.get('/todos', async (req, res) => {
+  try {
+      const todos = await Todo.find();
+       console.log("Todos from DB:", todos);
+    res.json(todos);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch todos' });
+  }
 });
 
-app.post('/todos', (req, res) => {
-  const newTodo = { id: Date.now().toString(), text: req.body.text };
-  todos.push(newTodo);
-  res.json(newTodo);
+// POST /todos - add new todo to DB
+app.post('/todos', async (req, res) => {
+  try {
+    const newTodo = new Todo({ text: req.body.text });
+    const savedTodo = await newTodo.save();
+    res.json(savedTodo);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add todo' });
+  }
 });
 
-app.delete('/todos/:id', (req, res) => {
-  todos = todos.filter(todo => todo.id !== req.params.id);
-  res.sendStatus(204);
+// DELETE /todos/:id - delete todo from DB
+app.delete('/todos/:id', async (req, res) => {
+  try {
+    await Todo.findByIdAndDelete(req.params.id);
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete todo' });
+  }
 });
 
-app.use(express.static('public'));
-
-// ✅ Now it's safe to start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
